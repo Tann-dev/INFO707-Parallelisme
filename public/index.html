@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <title>Centrale Nucléaire</title>
+</head>
+<body>
+    <div class="columnAdmin">
+        <div class="central">
+            <p>Seuil des températures : 800°C</p>
+            <div id="pipeContainer">
+                <div id="pipe"></div>
+            </div>
+            <div id="circle"></div>
+        </div>
+        <div class="columnAdmin">
+            <div class="buttonsPanel">
+                <div class="column" id="collector1">
+                    <h2>collecteur 1</h2>
+                    <button onclick="defcl1()">rendre défaillant</button>
+                    <button onclick="fctcl1()">rendre fonctionnel</button>
+                </div>
+                <div class="column" id="collector2">
+                    <h2>collecteur 2</h2>
+                    <button onclick="defcl2()">rendre défaillant</button>
+                    <button onclick="fctcl2()">rendre fonctionnel</button>
+                </div>
+                <div class="column" id="collector2">
+                    <h2>collecteur 3</h2>
+                    <button onclick="defcl3()">rendre défaillant</button>
+                    <button onclick="fctcl3()">rendre fonctionnel</button>
+                </div>
+            </div>
+            <div class="buttonsPanel">
+                <div class="column" id="captor1">
+                    <h2>capteur 1</h2>
+                    <button onclick="defcp1()">rendre défaillant</button>
+                    <button onclick="fctcp1()">rendre fonctionnel</button>
+                    <p>température</p>
+                    <input type="text" id="4001" name="4001" value="100" onchange="changeTemp1()">
+                </div>
+                <div class="column" id="captor2">
+                    <h2>capteur 2</h2>
+                    <button onclick="defcp2()">rendre défaillant</button>
+                    <button onclick="fctcp2()">rendre fonctionnel</button>
+                    <p>température</p>
+                    <input type="text" id="4002" name="4002" value="100" onchange="changeTemp2()">
+                </div>
+                <div class="column" id="captor3">
+                    <h2>capteur 3</h2>
+                    <button onclick="defcp3()">rendre défaillant</button>
+                    <button onclick="fctcp3()">rendre fonctionnel</button>
+                    <p>température</p>
+                    <input type="text" id="4003" name="4003" value="100" onchange="changeTemp3()">
+                </div>
+                <div class="column" id="captor4">
+                    <h2>capteur 4</h2>
+                    <button onclick="defcp4()">rendre défaillant</button>
+                    <button onclick="fctcp4()">rendre fonctionnel</button>
+                    <p>température</p>
+                    <input type="text" id="4004" name="4004" value="100" onchange="changeTemp4()">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const buttonCircle = document.getElementById('circle');
+        const pipe = document.getElementById('pipe');
+
+        const tempC1 = document.getElementById('4001');
+        const tempC2 = document.getElementById('4002');
+        const tempC3 = document.getElementById('4003');
+        const tempC4 = document.getElementById('4004');
+
+        const ws = new WebSocket(`ws://${location.host}`);
+        ws.onopen = function(e) {
+            ws.onmessage = function(event) {
+            data = JSON.parse(event.data)
+            console.log(data)
+            switch(data.color) {
+                case "vert":
+                    buttonCircle.style.background = "#00FF00"
+                    break
+                case "orange":
+                    buttonCircle.style.background = "#FFA500"
+                    break
+                case "rouge":
+                    buttonCircle.style.background = "#FF0000"
+                    break
+                }
+                if(data.pipe) {
+                    pipe.style.height = "200px"
+                } else {
+                    pipe.style.height = "100px" 
+                }
+            };
+        };
+
+        function changeTemp1(){
+            ws.send(JSON.stringify({message: "changeTemp", captor: "4001", value: tempC1.value}));
+        }
+
+        function changeTemp2(){
+            ws.send(JSON.stringify({message: "changeTemp", captor: "4002", value: tempC2.value}));
+        }
+
+        function changeTemp3(){
+            ws.send(JSON.stringify({message: "changeTemp", captor: "4003", value: tempC3.value}));
+        }
+
+        function changeTemp4(){
+            ws.send(JSON.stringify({message: "changeTemp", captor: "4004", value: tempC4.value}));
+        }
+
+        //Captors
+
+        function fctcp1() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4001", value: false}));
+        }
+
+        function defcp1() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4001", value: true}));
+        }
+
+        function fctcp2() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4002", value: false}));
+        }
+
+        function defcp2() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4002", value: true}));
+        }
+
+        function fctcp3() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4003", value: false}));
+        }
+
+        function defcp3() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4003", value: true}));
+        }
+
+        function fctcp4() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4004", value: false}));
+        }
+
+        function defcp4() {
+            ws.send(JSON.stringify({message: "setDisableCaptor", captor: "4004", value: true}));
+        }
+
+        //Collectors
+
+        function fctcl1() {
+            ws.send(JSON.stringify({message: "setFaillingCollector", collector: "5001", value: false}));
+        }
+
+        function defcl1() {
+            ws.send(JSON.stringify({message: "setFaillingCollector", collector: "5001", value: true}));
+        }
+
+        function fctcl2() {
+            ws.send(JSON.stringify({message: "setFaillingCollector", collector: "5002", value: false}));
+        }
+
+        function defcl2() {
+            ws.send(JSON.stringify({message: "setFaillingCollector", collector: "5002", value: true}));
+        }
+
+        function fctcl3() {
+            ws.send(JSON.stringify({message: "setFaillingCollector", collector: "5003", value: false}));
+        }
+
+        function defcl3() {
+            ws.send(JSON.stringify({message: "setFaillingCollector", collector: "5003", value: true}));
+        }
+    
+        
+    </script>
+</body>
+</html>
